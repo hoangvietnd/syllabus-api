@@ -21,7 +21,8 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserRegistrationService userRegistrationService;
 
-    public AuthController(TokenService tokenService, AuthenticationManager authenticationManager,
+    public AuthController(TokenService tokenService,
+            AuthenticationManager authenticationManager,
             UserRegistrationService userRegistrationService) {
         this.tokenService = tokenService;
         this.authenticationManager = authenticationManager;
@@ -30,11 +31,18 @@ public class AuthController {
 
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.email(),
-                        loginRequest.password()));
-        return tokenService.generateToken(authentication);
+        System.out.println("Login attempt for email: " + loginRequest.email());
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.email(),
+                            loginRequest.password()));
+            System.out.println("Authentication successful for: " + loginRequest.email());
+            return tokenService.generateToken(authentication);
+        } catch (Exception e) {
+            System.out.println("Authentication failed for " + loginRequest.email() + ": " + e.getMessage());
+            throw e;
+        }
     }
 
     @PostMapping("/signup")
