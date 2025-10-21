@@ -1,18 +1,29 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://ep-dawn-smoke-a1pljrz5-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
-    username: neondb_owner
-    password: npg_lTd9CtBje3cP
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
-
-rsa:
-  public-key: classpath:certs/public.pem
-  private-key: classpath:certs/key.pem
+      spring:
+        datasource:
+          url: jdbc:postgresql://ep-dawn-smoke-a1pljrz5-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+          username: neondb_owner
+          password: npg_lTd9CtBje3cP
+          hikari:
+            maxLifetime: 240000
+            keepaliveTime: 60000
+            connectionTimeout: 30000
+        jpa:
+          hibernate:
+            ddl-auto: validate
+          properties:
+            hibernate:
+              dialect: org.hibernate.dialect.PostgreSQLDialect
+      flyway:
+        enabled: false
+        locations: classpath:db/migration
+     
+      rsa:
+        public-key: classpath:certs/public.pem
+        private-key: classpath:certs/key.pem
+     
+      server:
+        port: 8080
+     
+      app:
+        cors:
+          allowed-origins: https://9000-firebase-curriculum-app-1760674445523.cluster-6dx7corvpngoivimwvvljgokdw.cloudworkstations.dev

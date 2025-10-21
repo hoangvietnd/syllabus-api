@@ -21,10 +21,11 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserRegistrationService userRegistrationService;
 
-    public AuthController(TokenService tokenService, AuthenticationManager authenticationManager) {
+    public AuthController(TokenService tokenService, AuthenticationManager authenticationManager,
+            UserRegistrationService userRegistrationService) {
         this.tokenService = tokenService;
         this.authenticationManager = authenticationManager;
-        this.userRegistrationService = null;
+        this.userRegistrationService = userRegistrationService;
     }
 
     @PostMapping("/login")
@@ -32,9 +33,7 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.email(),
-                        loginRequest.password()
-                )
-        );
+                        loginRequest.password()));
         return tokenService.generateToken(authentication);
     }
 
