@@ -24,8 +24,9 @@ public class CourseController {
     private final CourseMapper mapper;
 
     @PostMapping
-    public ResponseEntity<CourseDto> create(@RequestBody @Valid CourseDto dto, @AuthenticationPrincipal UserPrincipal u) {
-        Course created = service.create(mapper.toCourse(dto), u.getId());
+    public ResponseEntity<CourseDto> create(@RequestBody @Valid CourseDto dto,
+            @AuthenticationPrincipal UserPrincipal user) {
+        Course created = service.create(mapper.toCourse(dto), user.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(created));
     }
 
@@ -34,5 +35,21 @@ public class CourseController {
         return (q.isPresent()
                 ? service.findByTitle(q.get(), pageable)
                 : service.list(pageable)).map(mapper::toDto);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CourseDto> update(@PathVariable Long id,
+            @RequestBody @Valid CourseDto dto,
+            @AuthenticationPrincipal UserPrincipal user) {
+        // user is available if you need to check for permissions
+        Course updated = service.update(id, mapper.toCourse(dto));
+        return ResponseEntity.ok(mapper.toDto(updated));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal user) {
+        service.delete(id);
     }
 }

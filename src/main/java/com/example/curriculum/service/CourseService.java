@@ -37,6 +37,10 @@ public class CourseService {
         return repo.save(c);
     }
 
+    public void delete(Long id) {
+        repo.deleteById(id);
+    }
+
     public Page<Course> findByTitle(String title, Pageable pageable) {
         return repo.findByTitleContainingIgnoreCase(title, pageable);
     }
