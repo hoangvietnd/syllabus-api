@@ -1,6 +1,6 @@
 package com.example.curriculum.api.controller;
 
-import com.example.curriculum.storage.MaterialStorageService;
+import com.example.curriculum.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +18,14 @@ import java.util.Map;
 @RequestMapping("/api/materials")
 public class MaterialController {
 
-    private final MaterialStorageService storageService;
+    private final FileStorageService fileStorageService;
 
     @PostMapping("/upload")
     public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
-            String filePath = storageService.save(file);
+            String filePath = fileStorageService.store(file);
             return ResponseEntity.ok(Map.of("path", filePath));
         } catch (IOException e) {
-            // For a real application, you should log the exception e
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Could not store the file: " + e.getMessage()));

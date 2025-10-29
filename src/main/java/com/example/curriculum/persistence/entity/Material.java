@@ -12,36 +12,25 @@ import java.time.Instant;
 @Setter
 public class Material {
 
-    public enum Type {
-        PDF, VIDEO, LINK
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "lesson_id", nullable = false)
-    private Lesson lesson;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private Type type;
-
-    @Column(name = "url_or_path", nullable = false, length = 1024)
-    private String urlOrPath;
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
 
     @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(name = "size_bytes")
-    private Long sizeBytes;
+    private String description;
 
-    @Column(name = "mime_type", length = 255)
-    private String mimeType;
+    @Column(nullable = false)
+    private String filePath;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(length = 100)
+    private String fileType;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
-
 }
-

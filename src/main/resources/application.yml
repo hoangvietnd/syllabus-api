@@ -27,3 +27,6 @@ server:
 app:
   cors:
     allowed-origins: https://9000-firebase-curriculum-app-1760674445523.cluster-6dx7corvpngoivimwvvljgokdw.cloudworkstations.dev,http://localhost:5173
+
+file:
+  upload-dir: ./uploads
