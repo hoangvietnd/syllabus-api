@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/courses")
+@RequestMapping("/courses")
 public class CourseController {
     private final CourseService service;
     private final CourseMapper mapper;
@@ -32,21 +32,26 @@ public class CourseController {
 
     @PostMapping(path = "/create-with-material", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<CourseDto> createWithMaterial(
-            @RequestParam("name") String name,
+            @RequestParam("title") String title,
             @RequestParam("description") String description,
             @RequestParam(name = "material", required = false) MultipartFile material,
             @AuthenticationPrincipal UserPrincipal user) throws IOException {
 
-        Course createdCourse = service.createCourseWithMaterial(name, description, user.getId(), material);
+        Course createdCourse = service.createCourseWithMaterial(title, description, user.getId(), material);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(createdCourse));
     }
-
 
     @PostMapping
     public ResponseEntity<CourseDto> create(@RequestBody @Valid CourseDto dto,
             @AuthenticationPrincipal UserPrincipal user) {
         Course created = service.create(mapper.toCourse(dto), user.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(created));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CourseDto> findById(@PathVariable Long id) {
+        Course course = service.findById(id);
+        return ResponseEntity.ok(mapper.toDto(course));
     }
 
     @GetMapping
@@ -72,11 +77,12 @@ public class CourseController {
         service.delete(id);
     }
 
-    @PostMapping("/{courseId}/materials")
-    public ResponseEntity<MaterialDto> addMaterial(@PathVariable Long courseId,
-            @RequestBody @Valid MaterialDto dto) {
-        Material newMaterial = materialMapper.toEntity(dto);
-        Material savedMaterial = service.addMaterialToCourse(courseId, newMaterial);
+    @PostMapping(path = "/{courseId}/materials", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<MaterialDto> addMaterial(
+            @PathVariable Long courseId,
+            @RequestParam("description") String description,
+            @RequestParam("file") MultipartFile file) throws IOException {
+        Material savedMaterial = service.addMaterialToCourse(courseId, description, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(materialMapper.toDto(savedMaterial));
     }
 }

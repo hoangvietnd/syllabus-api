@@ -29,10 +29,9 @@ public class CourseService {
     }
 
     @Transactional
-    public Course createCourseWithMaterial(String name, String description, Long userId, MultipartFile file) throws IOException {
-        // Step 1: Create and save the course
+    public Course createCourseWithMaterial(String title, String description, Long userId, MultipartFile file) throws IOException {
         Course course = new Course();
-        course.setTitle(name);
+        course.setTitle(title);
         course.setDescription(description);
         course.setVersion(1);
         course.setCreatedBy(userRepo.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found")));
@@ -40,22 +39,32 @@ public class CourseService {
         course.setUpdatedAt(Instant.now());
         Course savedCourse = repo.save(course);
 
-        // Step 2: If a file is provided, store it and create a material
         if (file != null && !file.isEmpty()) {
-            String filePath = fileStorageService.store(file);
-
-            Material material = new Material();
-            material.setName(file.getOriginalFilename());
-            material.setFilePath(filePath);
-            material.setFileType(file.getContentType());
-            material.setCourse(savedCourse);
-            materialRepo.save(material);
-            
-            // Since the relationship is bidirectional, add material to the course's list
-            savedCourse.getMaterials().add(material);
+            this.addMaterialToCourse(savedCourse.getId(), "Initial material", file);
         }
 
         return savedCourse;
+    }
+
+    @Transactional
+    public Material addMaterialToCourse(Long courseId, String description, MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File is required for material.");
+        }
+
+        Course course = repo.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("Course not found with ID: " + courseId));
+
+        String filePath = fileStorageService.store(file);
+
+        Material material = new Material();
+        material.setName(file.getOriginalFilename());
+        material.setDescription(description);
+        material.setFilePath(filePath);
+        material.setFileType(file.getContentType());
+        material.setCourse(course);
+
+        return materialRepo.save(material);
     }
     
     public Course create(Course c, Long userId) {
@@ -64,6 +73,10 @@ public class CourseService {
         c.setCreatedAt(Instant.now());
         c.setUpdatedAt(Instant.now());
         return repo.save(c);
+    }
+
+    public Course findById(Long id) {
+        return repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Course not found"));
     }
 
     public Course update(Long id, Course update) {
@@ -86,13 +99,5 @@ public class CourseService {
 
     public Page<Course> list(Pageable pageable) {
         return repo.findAll(pageable);
-    }
-
-    @Transactional
-    public Material addMaterialToCourse(Long courseId, Material material) {
-        Course course = repo.findById(courseId)
-                .orElseThrow(() -> new IllegalArgumentException("Course not found"));
-        material.setCourse(course);
-        return materialRepo.save(material);
     }
 }

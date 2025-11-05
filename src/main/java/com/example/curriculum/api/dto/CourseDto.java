@@ -11,6 +11,7 @@ public class CourseDto {
     private String title;
     private String description;
     private List<String> tags;
+    private List<MaterialDto> materials;
     private Integer version;
     private Long createdBy;
     private Instant createdAt;

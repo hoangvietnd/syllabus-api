@@ -4,11 +4,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.curriculum.persistence.converter.StringListJsonConverter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -40,7 +40,7 @@ public class Course {
     @Column(columnDefinition = "text")
     private String description;
 
-    @Convert(converter = StringListJsonConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<String> tags = new ArrayList<>();
 
@@ -56,9 +56,6 @@ public class Course {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt = Instant.now();
-
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Module> modules = new ArrayList<>();
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Material> materials = new ArrayList<>();

@@ -11,6 +11,7 @@ public interface MaterialMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "course", ignore = true)
     @Mapping(target = "fileType", ignore = true) // Will be set in the service
+    @Mapping(target = "createdAt", ignore = true) // createdAt is auto-generated
     Material toEntity(MaterialDto dto);
 
     @Mapping(source = "course.id", target = "courseId")

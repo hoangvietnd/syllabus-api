@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,4 +28,7 @@ public class MaterialDto {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long courseId;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Instant createdAt;
 }
