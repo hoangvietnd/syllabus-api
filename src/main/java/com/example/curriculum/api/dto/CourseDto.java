@@ -13,7 +13,7 @@ public class CourseDto {
     private List<String> tags;
     private List<MaterialDto> materials;
     private Integer version;
-    private Long createdBy;
+    private String createdBy; // Changed from Long to String
     private Instant createdAt;
     private Instant updatedAt;
 

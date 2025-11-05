@@ -30,5 +30,14 @@ public class MaterialDto {
     private Long courseId;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String createdBy;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String updatedBy;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Instant createdAt;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Instant updatedAt;
 }

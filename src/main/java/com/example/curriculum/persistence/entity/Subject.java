@@ -7,39 +7,34 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.List;
 
-@Entity
-@Table(name = "materials")
 @Getter
 @Setter
-public class Material {
+@Entity
+@Table(name = "subjects")
+public class Subject {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "course_id", nullable = false)
-    private Course course;
-
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(columnDefinition = "text")
     private String description;
 
-    @Column(nullable = false)
-    private String filePath;
-
-    @Column(length = 100)
-    private String fileType;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", updatable = false)
+    @JoinColumn(name = "created_by", updatable = false, nullable = false)
     private User createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     private User updatedBy;
+
+    @OneToMany(mappedBy = "subject", cascade = CascadeType.PERSIST, orphanRemoval = false)
+    private List<Course> courses;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

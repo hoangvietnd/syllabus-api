@@ -40,6 +40,10 @@ public class Course {
     @Column(columnDefinition = "text")
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<String> tags = new ArrayList<>();
@@ -48,8 +52,12 @@ public class Course {
     private Integer version = 1;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
+    @JoinColumn(name = "created_by", updatable = false, nullable = false)
     private User createdBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updated_by")
+    private User updatedBy;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
