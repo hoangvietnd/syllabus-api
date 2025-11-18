@@ -6,8 +6,9 @@ import com.example.curriculum.api.mapper.CourseMapper;
 import com.example.curriculum.api.mapper.MaterialMapper;
 import com.example.curriculum.persistence.entity.Course;
 import com.example.curriculum.persistence.entity.Material;
-import com.example.curriculum.service.CourseService;
+import com.example.curriculum.persistence.entity.User;
 import com.example.curriculum.security.UserPrincipal;
+import com.example.curriculum.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -35,16 +35,17 @@ public class CourseController {
             @RequestParam("title") String title,
             @RequestParam("description") String description,
             @RequestParam(name = "material", required = false) MultipartFile material,
-            @AuthenticationPrincipal UserPrincipal user) throws IOException {
-
-        Course createdCourse = service.createCourseWithMaterial(title, description, user.getId(), material);
+            @AuthenticationPrincipal UserPrincipal userPrincipal) throws IOException {
+        User currentUser = userPrincipal.getUser();
+        Course createdCourse = service.createCourseWithMaterial(title, description, currentUser, material);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(createdCourse));
     }
 
     @PostMapping
     public ResponseEntity<CourseDto> create(@RequestBody @Valid CourseDto dto,
-            @AuthenticationPrincipal UserPrincipal user) {
-        Course created = service.create(mapper.toCourse(dto), user.getId());
+                                            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        User currentUser = userPrincipal.getUser();
+        Course created = service.create(mapper.toCourse(dto), currentUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toDto(created));
     }
 
@@ -55,25 +56,24 @@ public class CourseController {
     }
 
     @GetMapping
-    public Page<CourseDto> list(@RequestParam Optional<String> q, Pageable pageable) {
-        return (q.isPresent()
-                ? service.findByTitle(q.get(), pageable)
+    public Page<CourseDto> list(@RequestParam(name = "title", required = false) String title, Pageable pageable) {
+        return ((title != null && !title.isBlank())
+                ? service.findByTitle(title, pageable)
                 : service.list(pageable)).map(mapper::toDto);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CourseDto> update(@PathVariable Long id,
-            @RequestBody @Valid CourseDto dto,
-            @AuthenticationPrincipal UserPrincipal user) {
-        // user is available if you need to check for permissions
-        Course updated = service.update(id, mapper.toCourse(dto));
+                                            @RequestBody @Valid CourseDto dto,
+                                            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        User currentUser = userPrincipal.getUser();
+        Course updated = service.update(id, dto, currentUser);
         return ResponseEntity.ok(mapper.toDto(updated));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id,
-            @AuthenticationPrincipal UserPrincipal user) {
+    public void delete(@PathVariable Long id) {
         service.delete(id);
     }
 
@@ -81,8 +81,10 @@ public class CourseController {
     public ResponseEntity<MaterialDto> addMaterial(
             @PathVariable Long courseId,
             @RequestParam("description") String description,
-            @RequestParam("file") MultipartFile file) throws IOException {
-        Material savedMaterial = service.addMaterialToCourse(courseId, description, file);
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) throws IOException {
+        User currentUser = userPrincipal.getUser();
+        Material savedMaterial = service.addMaterialToCourse(courseId, description, file, currentUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(materialMapper.toDto(savedMaterial));
     }
 }

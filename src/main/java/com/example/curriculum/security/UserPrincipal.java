@@ -1,3 +1,4 @@
+
 package com.example.curriculum.security;
 
 import com.example.curriculum.persistence.entity.User;
@@ -14,6 +15,10 @@ public class UserPrincipal implements UserDetails {
 
     public UserPrincipal(User user) {
         this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public Long getId() {

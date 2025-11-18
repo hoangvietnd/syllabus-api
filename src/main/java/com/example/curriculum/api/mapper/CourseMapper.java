@@ -5,11 +5,12 @@ import com.example.curriculum.persistence.entity.Course;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = MaterialMapper.class)
+@Mapper(componentModel = "spring", uses = { MaterialMapper.class, SubjectMapper.class })
 public interface CourseMapper {
 
     @Mapping(source = "createdBy.fullName", target = "createdBy")
     @Mapping(source = "materials", target = "materials")
+    @Mapping(source = "subject", target = "subject")
     CourseDto toDto(Course course);
 
     @Mapping(target = "createdBy", ignore = true)
